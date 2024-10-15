@@ -42,20 +42,43 @@ button.primary {
   padding: 50px 0;
 }
 
-.container .column {
-  width: 250px;
-  height: 600px;
-  background-color: #FFF;
-  border-radius: 10px;
-  overflow: hidden;
-}
+  .container .column {
+    width: 250px;
+    height: 600px;
+    background-color: #FFF;
+    border-radius: 10px;
+    overflow: hidden;
+  }
 
-.container .column .head {
-  background-color: var(--primary-color);
-  color: #FFF;
-  padding: 15px;
-  text-align: center;
-}
+    .container .column .head {
+      background-color: var(--primary-color);
+      color: #FFF;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .container .column .body {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+    }
+
+      .container .column .body .card {
+        background-color: #EEE;
+        border-radius: 7px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+        .container .column .body .card .info {
+          font-size: 14px;
+          color: #333;
+          display: flex;
+          flex-direction: column;
+        }
 
 #modal {
   position: fixed;
@@ -64,7 +87,7 @@ button.primary {
   left: 0;
   right: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
 }
@@ -97,7 +120,7 @@ button.primary {
         cursor: pointer;
         color: #333;
       }
-    
+
     #modal .box .form {
       padding: 20px;
     }
