@@ -3,6 +3,10 @@ const $descriptionInput = document.getElementById('description');
 const $priorityInput = document.getElementById('priority');
 const $deadlineInput = document.getElementById('deadline');
 
+const $todoColumnBody = document.querySelector('#todoColumn .body');
+
+var todoList = [];
+
 function openModal() {
   $modal.style.display = 'flex';
 }
@@ -11,34 +15,41 @@ function closeModal() {
   $modal.style.display = 'none';
 }
 
-function createTask() {
-  const description = $descriptionInput.value;
-  const priority = $priorityInput.value;
-  const deadline = $deadlineInput.value;
-
-  if (description && priority && deadline) {
-    const task = {
-      description,
-      priority,
-      deadline,
-    };
-
-    // Aqui você pode adicionar a lógica para salvar a tarefa no banco de dados ou em algum lugar.
-    // Por enquanto, vamos apenas exibir a tarefa na tela.
-    const taskElement = document.createElement('div');
-    taskElement.classList.add('task');
-    taskElement.innerHTML = `
-      <span>${task.description}</span>
-      <span>${task.priority}</span>
-      <span>${task.deadline}</span>
+function generateCards() {
+  const todoListHtml = todoList.map(function(task) {
+    const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
+    return `
+      <div class="card">
+        <div class="info">
+          <b>Descrição:</b>
+          <span>${task.description}</span>
+        </div>
+      
+        <div class="info">
+          <b>Prioridade:</b>
+          <span>${task.priority}</span>
+        </div>
+        
+        <div class="info">
+          <b>Prazo:</b>
+          <span>${formattedDate}</span>
+        </div>
+      </div>
     `;
+  })
 
-    const column = document.querySelector('.column.in-progress');
-    column.appendChild(taskElement);
+  $todoColumnBody.innerHTML = todoListHtml.join('');
+}
 
-    // Limpar os campos após criar a tarefa
-    $descriptionInput.value = '';
-    $priorityInput.value = 'Baixa';
-    $deadlineInput.value = '';
+function createTask() {
+  const newTask = {
+    description: $descriptionInput.value,
+    priority: $priorityInput.value,
+    deadline: $deadlineInput.value,
   }
+
+  todoList.push(newTask);
+
+  closeModal();
+  generateCards();
 }
