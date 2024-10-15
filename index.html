@@ -14,7 +14,7 @@
 <body>
   <div class="header">
     <h1>Kanban Board</h1>
-    <button class="primary">Nova tarefa</button>
+    <button class="primary" onclick="openModal()">Nova tarefa</button>
   </div>
 
   <div class="container">
@@ -51,7 +51,7 @@
     <div class="box">
       <div class="head">
         <span>Nova tarefa</span>
-        <button>x</button>
+        <button onclick="closeModal()">x</button>
       </div>
 
       <div class="form">
@@ -74,7 +74,7 @@
           <input type="date" id="deadline">
         </div>
 
-        <button class="primary">Cadastrar</button>
+        <button class="primary" onclick="createTask()">Cadastrar</button>
       </div>  
     </div>
   </div>
