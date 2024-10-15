@@ -50,11 +50,14 @@
   <div id="modal">
     <div class="box">
       <div class="head">
-        <span>Nova tarefa</span>
+        <span id="creationModeTitle">Nova tarefa</span>
+        <span id="editingModeTitle">Editar tarefa</span>
         <button onclick="closeModal()">x</button>
       </div>
 
       <div class="form">
+        <input type="hidden" id="idInput">
+        
         <div class="form-group">
           <label for="description">Descrição</label>
           <textarea id="description" rows="3"></textarea>
@@ -74,7 +77,8 @@
           <input type="date" id="deadline">
         </div>
 
-        <button class="primary" onclick="createTask()">Cadastrar</button>
+        <button class="primary" onclick="createTask()" id="creationModeBtn">Cadastrar</button>
+        <button class="primary" onclick="updateTask()" id="editingModeBtn">Salvar alterações</button>
       </div>  
     </div>
   </div>
