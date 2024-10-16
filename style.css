@@ -47,6 +47,8 @@ button.primary {
     background-color: #FFF;
     border-radius: 10px;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
     .container .column .head {
@@ -57,11 +59,27 @@ button.primary {
     }
 
     .container .column .body {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
       padding: 20px;
+      overflow-y: auto;
     }
+
+      .container .column .body .cards_list {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container .column .body .add_btn {
+        background: none;
+        border: 1px solid;
+        border-radius: 10px;
+        padding: 5px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        cursor: pointer;
+        color: #444;
+      }
 
       .container .column .body .card {
         background-color: #EEE;
@@ -70,6 +88,7 @@ button.primary {
         display: flex;
         flex-direction: column;
         gap: 10px;
+        margin-bottom: 20px;
       }
 
         .container .column .body .card .info {

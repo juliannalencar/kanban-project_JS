@@ -13,37 +13,48 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <div class="header">
+  <!--<div class="header">
     <h1>Kanban Board</h1>
     <button class="primary" onclick="openModal()">Nova tarefa</button>
-  </div>
+  </div> -->
 
   <div class="container">
-    
-    <div class="column" id="todoColumn">
+    <div class="column" data-column="1">
       <div class="head">
         <span>To do</span>
       </div>
       <div class="body">
-
+        <div class="cards_list"></div>
+        <button class="add_btn" onclick="openModal(1)">
+          <span class="material-symbols-outlined">add</span>
+          Adicionar item
+        </button>
       </div>
     </div> 
       
-    <div class="column">
+    <div class="column" data-column="2">
       <div class="head">
         <span>In progress</span>
       </div>
       <div class="body">
-  
+        <div class="cards_list"></div>
+        <button class="add_btn" onclick="openModal(2)">
+          <span class="material-symbols-outlined">add</span>
+          Adicionar item
+        </button>  
       </div>
     </div>
 
-    <div class="column">
+    <div class="column" data-column="3">
       <div class="head">
         <span>Completed</span>
       </div>
       <div class="body">
-    
+        <div class="cards_list"></div>
+        <button class="add_btn" onclick="openModal(3)">
+          <span class="material-symbols-outlined">add</span>
+          Adicionar item
+        </button>    
       </div>
     </div>
   </div>
@@ -53,7 +64,9 @@
       <div class="head">
         <span id="creationModeTitle">Nova tarefa</span>
         <span id="editingModeTitle">Editar tarefa</span>
-        <button class="material-symbols-outlined" onclick="closeModal()">close</button>
+        <button class="material-symbols-outlined" onclick="closeModal()">
+          close
+        </button>
       </div>
 
       <div class="form">
@@ -70,6 +83,15 @@
             <option>Baixa</option>
             <option>Média</option>
             <option>Alta</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="column">Coluna</label>
+          <select id="column">
+            <option value="1">To do</option>
+            <option value="2">In progress</option>
+            <option value="3">Completed</option>
           </select>
         </div>
 
