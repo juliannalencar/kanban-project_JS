@@ -19,7 +19,7 @@
   </div> -->
 
   <div class="container">
-    <div class="column" data-column="1">
+    <div class="column" data-column="1" ondrop="drop_handler(event)" ondragover="dragover_handler(event)">
       <div class="head">
         <span>To do</span>
       </div>
@@ -32,7 +32,7 @@
       </div>
     </div> 
       
-    <div class="column" data-column="2">
+    <div class="column" data-column="2" ondrop="drop_handler(event)" ondragover="dragover_handler(event)">
       <div class="head">
         <span>In progress</span>
       </div>
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div class="column" data-column="3">
+    <div class="column" data-column="3" ondrop="drop_handler(event)" ondragover="dragover_handler(event)">
       <div class="head">
         <span>Completed</span>
       </div>

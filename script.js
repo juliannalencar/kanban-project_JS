@@ -73,7 +73,13 @@ function generateCards() {
     const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
 
     const card = `
-      <div class="card" ondblclick="openModalToEdit(${task.id})">
+      <div
+        id="${task.id}"
+        class="card"
+        ondblclick="openModalToEdit(${task.id})"
+        draggable="true"
+        ondragstart="dragstart_handler(event)"
+      >
         <div class="info">
           <b>Descrição:</b>
           <span>${task.description}</span>
@@ -127,4 +133,36 @@ function updateTask() {
 
   closeModal();
   generateCards();
+}
+
+function changeColumn(task_id, column_id) {
+  if (task_id && column_id) {
+    taskList = taskList.map((task) => {
+      if (task_id != task.id) return task;
+  
+      return {
+        ...task,
+        column: column_id,
+      };
+    });
+  }
+  generateCards();
+}
+function dragstart_handler(ev) {
+  console.log(ev);
+  // Add the target element's id to the data transfer object
+  ev.dataTransfer.setData("my_custom_data", ev.target.id);
+  ev.dataTransfer.effectAllowed = "move";
+}
+function dragover_handler(ev) {
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = "move";
+}
+function drop_handler(ev) {
+  ev.preventDefault();
+  // Get the id of the target and add the moved element to the target's DOM
+  const task_id = ev.dataTransfer.getData("my_custom_data");
+  const column_id = ev.target.dataset.column;
+  
+  changeColumn(task_id, column_id);
 }
