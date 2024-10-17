@@ -1,7 +1,7 @@
 // Seleção de elementos do modal e inputs para manipulação de tarefas
 const $modal = document.getElementById('modal');
 const $descriptionInput = document.getElementById('description');
-const $priorityInput = document.getElementById('priority');
+const $subjectInput = document.getElementById('subject');
 const $deadlineInput = document.getElementById('deadline');
 const $idInput = document.getElementById('idInput');
 
@@ -44,7 +44,7 @@ function openModalToEdit(id) {
 
   $idInput.value = task.id;
   $descriptionInput.value = task.description;
-  $priorityInput.value = task.priority;
+  $subjectInput.value = task.subject;
   $deadlineInput.value = task.deadline;
 }
 
@@ -55,7 +55,7 @@ function closeModal() {
   // Limpa todos os campos do modal
   $idInput.value = '';
   $descriptionInput.value = '';
-  $priorityInput.value = '';
+  $subjectInput.value = '';
   $deadlineInput.value = '';
 }
 
@@ -96,8 +96,8 @@ function generateCards() {
           <span>${task.description}</span>
         </div>
         <div class="info">
-          <b>Prioridade:</b>
-          <span>${task.priority}</span>
+          <b>Assunto:</b>
+          <span>${task.subject}</span>
         </div>
         <div class="info">
           <b>Prazo:</b>
@@ -109,6 +109,9 @@ function generateCards() {
     console.log("Adicionando cartão:", card); // Verifica o HTML do cartão que está sendo adicionado
     columnBody.innerHTML += card; // Adiciona o cartão à coluna correspondente
   });
+
+  // Atualiza a contagem de tarefas em cada coluna após gerar os cartões
+  updateTaskCount();
 }
 
 // Função para criar uma nova tarefa
@@ -116,7 +119,7 @@ function createTask() {
   const newTask = {
     id: Math.floor(Math.random() * 9999999), // Gera um ID único aleatório para a tarefa
     description: $descriptionInput.value,
-    priority: $priorityInput.value,
+    subject: $subjectInput.value,
     deadline: $deadlineInput.value,
     column: 1, // Define sempre a coluna como "To Do" (coluna 1)
   }
@@ -131,22 +134,31 @@ function createTask() {
 
 // Função para atualizar uma tarefa existente
 function updateTask() {
-  const task = {
-    id: $idInput.value,
-    description: $descriptionInput.value,
-    priority: $priorityInput.value,
-    deadline: $deadlineInput.value,
-    column: 1, // Força a tarefa editada a permanecer na coluna "To Do"
-  }
-
+  // Encontra a tarefa original para obter a coluna atual
   const index = taskList.findIndex(function(task) {
     return task.id == $idInput.value;
   });
 
-  taskList[index] = task;
+  if (index === -1) {
+    console.error("Erro: Tarefa não encontrada para atualização.");
+    return;
+  }
 
-  closeModal();
-  generateCards();
+  // Mantém a coluna existente da tarefa
+  const existingTask = taskList[index];
+  const updatedTask = {
+    id: existingTask.id,
+    description: $descriptionInput.value,
+    subject: $subjectInput.value,
+    deadline: $deadlineInput.value,
+    column: existingTask.column, // Mantém a coluna atual da tarefa
+  };
+
+  // Atualiza a tarefa na lista
+  taskList[index] = updatedTask;
+
+  closeModal(); // Fecha o modal
+  generateCards(); // Atualiza os cartões exibidos nas colunas
 }
 
 // Função para mover uma tarefa para outra coluna após arrastar e soltar
@@ -181,7 +193,6 @@ function dragover_handler(ev) {
 // Função para lidar com o evento de soltar o cartão em uma nova coluna
 function drop_handler(ev) {
   ev.preventDefault();
-  // Certifique-se de que o `ev.target` é uma coluna válida para obter `column_id`
   const task_id = ev.dataTransfer.getData("my_custom_data");
   const columnElement = ev.target.closest(".column"); // Encontra a coluna mais próxima
   const column_id = columnElement ? columnElement.dataset.column : null;
@@ -192,4 +203,18 @@ function drop_handler(ev) {
   } else {
     console.error("Erro: Coluna de destino não encontrada.");
   }
+}
+
+// Função para atualizar a contagem de tarefas em cada coluna
+function updateTaskCount() {
+  const columns = [1, 2, 3]; // IDs das colunas "To Do", "In Progress", e "Completed"
+
+  columns.forEach(columnId => {
+    const count = taskList.filter(task => task.column == columnId).length;
+    const columnHeader = document.querySelector(`[data-column="${columnId}"] .head span`);
+    
+    if (columnHeader) {
+      columnHeader.innerText = `${columnHeader.innerText.split('(')[0].trim()} (${count})`;
+    }
+  });
 }
