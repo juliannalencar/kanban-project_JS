@@ -1,8 +1,8 @@
+// Seleção de elementos do modal e inputs para manipulação de tarefas
 const $modal = document.getElementById('modal');
 const $descriptionInput = document.getElementById('description');
 const $priorityInput = document.getElementById('priority');
 const $deadlineInput = document.getElementById('deadline');
-const $columnInput = document.getElementById('column');
 const $idInput = document.getElementById('idInput');
 
 const $creationModeTitle = document.getElementById('creationModeTitle');
@@ -13,18 +13,20 @@ const $editingModeBtn = document.getElementById('editingModeBtn');
 
 var taskList = [];
 
-function openModal(data_column) {
+// Função para abrir o modal no modo de criação de tarefa
+function openModal() {
   $modal.style.display = 'flex';
 
-  $columnInput.value = data_column;
-  
+  // Mostra os elementos do modo de criação
   $creationModeTitle.style.display = 'block';
   $creationModeBtn.style.display = 'block';
-  
+
+  // Oculta os elementos do modo de edição
   $editingModeTitle.style.display = 'none';
   $editingModeBtn.style.display = 'none';
 }
 
+// Função para abrir o modal no modo de edição de uma tarefa existente
 function openModalToEdit(id) {
   $modal.style.display = "flex";
   
@@ -44,34 +46,43 @@ function openModalToEdit(id) {
   $descriptionInput.value = task.description;
   $priorityInput.value = task.priority;
   $deadlineInput.value = task.deadline;
-  $columnInput.value = task.column;
 }
 
+// Função para fechar o modal e limpar os inputs
 function closeModal() {
   $modal.style.display = 'none';
 
+  // Limpa todos os campos do modal
   $idInput.value = '';
   $descriptionInput.value = '';
   $priorityInput.value = '';
   $deadlineInput.value = '';
-  $columnInput.value = '';
 }
 
+// Função para resetar todas as colunas, removendo todos os cartões
 function resetColumns() {
-  document.querySelector('[data-column="1"] .body .cards_list').innerHTML = '';
-  document.querySelector('[data-column="2"] .body .cards_list').innerHTML = '';
-  document.querySelector('[data-column="3"] .body .cards_list').innerHTML = '';
+  document.querySelectorAll('.cards_list').forEach(column => {
+    column.innerHTML = '';
+  });
 }
 
+// Função para gerar os cartões de tarefa dinamicamente
 function generateCards() {
-
-  resetColumns();
+  resetColumns(); // Limpa todas as colunas antes de adicionar novos cartões
+  console.log("Gerando cartões para tarefas:", taskList); // Log para verificar a lista de tarefas
 
   taskList.forEach(function(task) {
     const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
 
+    // Seleciona o corpo da coluna correta com base na coluna da tarefa
     const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
+    
+    if (!columnBody) {
+      console.error("Erro: coluna não encontrada.");
+      return;
+    }
 
+    // Cria o HTML do cartão da tarefa
     const card = `
       <div
         id="${task.id}"
@@ -84,12 +95,10 @@ function generateCards() {
           <b>Descrição:</b>
           <span>${task.description}</span>
         </div>
-      
         <div class="info">
           <b>Prioridade:</b>
           <span>${task.priority}</span>
         </div>
-        
         <div class="info">
           <b>Prazo:</b>
           <span>${formattedDate}</span>
@@ -97,32 +106,37 @@ function generateCards() {
       </div>
     `;
 
-    columnBody.innerHTML += card;
+    console.log("Adicionando cartão:", card); // Verifica o HTML do cartão que está sendo adicionado
+    columnBody.innerHTML += card; // Adiciona o cartão à coluna correspondente
   });
 }
 
+// Função para criar uma nova tarefa
 function createTask() {
   const newTask = {
-    id: Math.floor(Math.random() * 9999999),
+    id: Math.floor(Math.random() * 9999999), // Gera um ID único aleatório para a tarefa
     description: $descriptionInput.value,
     priority: $priorityInput.value,
     deadline: $deadlineInput.value,
-    column: $columnInput.value,
+    column: 1, // Define sempre a coluna como "To Do" (coluna 1)
   }
 
-  taskList.push(newTask);
+  console.log("Nova tarefa criada:", newTask); // Log para verificação
 
-  closeModal();
-  generateCards();
+  taskList.push(newTask); // Adiciona a nova tarefa à lista de tarefas
+
+  closeModal(); // Fecha o modal
+  generateCards(); // Atualiza os cartões exibidos nas colunas
 }
 
+// Função para atualizar uma tarefa existente
 function updateTask() {
   const task = {
     id: $idInput.value,
     description: $descriptionInput.value,
     priority: $priorityInput.value,
     deadline: $deadlineInput.value,
-    column: $columnInput.value,
+    column: 1, // Força a tarefa editada a permanecer na coluna "To Do"
   }
 
   const index = taskList.findIndex(function(task) {
@@ -135,6 +149,7 @@ function updateTask() {
   generateCards();
 }
 
+// Função para mover uma tarefa para outra coluna após arrastar e soltar
 function changeColumn(task_id, column_id) {
   if (task_id && column_id) {
     taskList = taskList.map((task) => {
@@ -148,21 +163,33 @@ function changeColumn(task_id, column_id) {
   }
   generateCards();
 }
+
+// Função para lidar com o evento de início de arrastar
 function dragstart_handler(ev) {
   console.log(ev);
   // Add the target element's id to the data transfer object
   ev.dataTransfer.setData("my_custom_data", ev.target.id);
   ev.dataTransfer.effectAllowed = "move";
 }
+
+// Função para permitir que um elemento seja arrastado para uma área de soltura
 function dragover_handler(ev) {
   ev.preventDefault();
   ev.dataTransfer.dropEffect = "move";
 }
+
+// Função para lidar com o evento de soltar o cartão em uma nova coluna
 function drop_handler(ev) {
   ev.preventDefault();
-  // Get the id of the target and add the moved element to the target's DOM
+  // Certifique-se de que o `ev.target` é uma coluna válida para obter `column_id`
   const task_id = ev.dataTransfer.getData("my_custom_data");
-  const column_id = ev.target.dataset.column;
+  const columnElement = ev.target.closest(".column"); // Encontra a coluna mais próxima
+  const column_id = columnElement ? columnElement.dataset.column : null;
   
-  changeColumn(task_id, column_id);
+  if (column_id) {
+    console.log("Tarefa movida:", task_id, "para coluna:", column_id); // Log para verificação
+    changeColumn(task_id, column_id);
+  } else {
+    console.error("Erro: Coluna de destino não encontrada.");
+  }
 }
