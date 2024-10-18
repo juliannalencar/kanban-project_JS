@@ -1,7 +1,7 @@
 // Seleção de elementos do modal e inputs para manipulação de tarefas
 const $modal = document.getElementById('modal');
 const $descriptionInput = document.getElementById('description');
-const $subjectInput = document.getElementById('subject');
+const $tagsInput = document.getElementById('tags');
 const $deadlineInput = document.getElementById('deadline');
 const $idInput = document.getElementById('idInput');
 
@@ -44,7 +44,7 @@ function openModalToEdit(id) {
 
   $idInput.value = task.id;
   $descriptionInput.value = task.description;
-  $subjectInput.value = task.subject;
+  $tagsInput.value = task.tags;
   $deadlineInput.value = task.deadline;
 }
 
@@ -55,7 +55,7 @@ function closeModal() {
   // Limpa todos os campos do modal
   $idInput.value = '';
   $descriptionInput.value = '';
-  $subjectInput.value = '';
+  $tagsInput.value = '';
   $deadlineInput.value = '';
 }
 
@@ -97,7 +97,7 @@ function generateCards() {
         </div>
         <div class="info">
           <b>Assunto:</b>
-          <span>${task.subject}</span>
+          <span>${task.tags}</span>
         </div>
         <div class="info">
           <b>Prazo:</b>
@@ -119,7 +119,7 @@ function createTask() {
   const newTask = {
     id: Math.floor(Math.random() * 9999999), // Gera um ID único aleatório para a tarefa
     description: $descriptionInput.value,
-    subject: $subjectInput.value,
+    tags: $tagsInput.value,
     deadline: $deadlineInput.value,
     column: 1, // Define sempre a coluna como "To Do" (coluna 1)
   }
@@ -149,7 +149,7 @@ function updateTask() {
   const updatedTask = {
     id: existingTask.id,
     description: $descriptionInput.value,
-    subject: $subjectInput.value,
+    tags: $tagsInput.value,
     deadline: $deadlineInput.value,
     column: existingTask.column, // Mantém a coluna atual da tarefa
   };
