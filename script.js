@@ -103,6 +103,7 @@ function generateCards() {
           <b>Prazo:</b>
           <span>${formattedDate}</span>
         </div>
+        <button class="material-symbols-outlined" onclick="deleteTask(${task.id})">delete</button>
       </div>
     `;
 
@@ -130,6 +131,14 @@ function createTask() {
 
   closeModal(); // Fecha o modal
   generateCards(); // Atualiza os cartões exibidos nas colunas
+}
+
+// Função para deletar uma tarefa
+function deleteTask(taskId) {
+  // Remove a tarefa da lista pelo ID
+  taskList = taskList.filter(task => task.id !== taskId);
+  // Atualiza a interface para remover o card
+  generateCards();
 }
 
 // Função para atualizar uma tarefa existente
