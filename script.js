@@ -72,15 +72,19 @@ function generateCards() {
   console.log("Gerando cartões para tarefas:", taskList); // Log para verificar a lista de tarefas
 
   taskList.forEach(function(task) {
-    const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
+      if (selectedTag !== 'all' && task.tags !== selectedTag) {
+          return;
+      }
 
-    // Seleciona o corpo da coluna correta com base na coluna da tarefa
-    const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
-    
-    if (!columnBody) {
-      console.error("Erro: coluna não encontrada.");
-      return;
-    }
+      const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
+
+      // Seleciona o corpo da coluna correta com base na coluna da tarefa
+      const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
+      
+      if (!columnBody) {
+          console.error("Erro: coluna não encontrada.");
+          return;
+      }
 
     // Cria o HTML do cartão da tarefa
     const card = `
@@ -226,4 +230,21 @@ function updateTaskCount() {
       columnHeader.innerText = `${columnHeader.innerText.split('(')[0].trim()} (${count})`;
     }
   });
+}
+
+let selectedTag = 'all';
+
+// Função para filtrar as tarefas com base na tag selecionada
+function filterTasks(tag) {
+    selectedTag = tag;
+
+    // Adiciona/remove a classe 'selected' para as tags
+    document.querySelectorAll('.tag').forEach((element) => {
+        element.classList.remove('selected');
+        if (element.textContent.toLowerCase() === tag) {
+            element.classList.add('selected');
+        }
+    });
+
+    generateCards();
 }

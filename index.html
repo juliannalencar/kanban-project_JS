@@ -16,7 +16,14 @@
   <div class="header">
     <h1>Kanban Board</h1>
     <button class="primary" onclick="openModal()">Nova tarefa</button>
-  </div>
+</div>
+
+<div class="tag-filters">
+    <span class="tag" onclick="filterTasks('frontend')">FrontEnd</span>
+    <span class="tag" onclick="filterTasks('backend')">BackEnd</span>
+    <span class="tag" onclick="filterTasks('ux design')">UX Design</span>
+    <span class="tag" onclick="filterTasks('all')">Todos</span>
+</div>
 
   <div class="container">
     <div class="column" data-column="1" ondrop="drop_handler(event)" ondragover="dragover_handler(event)">
@@ -70,7 +77,7 @@
           <select id="tags">
             <option value="frontend">Frontend</option>
             <option value="backend">Backend</option>
-            <option value="ux design">UX design</option>
+            <option value="ux design">UX Design</option>
           </select>
         </div>
 

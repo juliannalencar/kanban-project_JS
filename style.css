@@ -21,6 +21,7 @@ body {
   align-items: center;
   background-color: #FFF;
   padding: 30px;
+  flex-wrap: wrap; /* Permite que os itens sejam distribuídos em várias linhas se necessário */
 }
 
 button.primary {
@@ -42,7 +43,7 @@ button.primary {
 }
 
   .container .column {
-    width: 250px;
+    width: 300px;
     height: 600px;
     background-color: #FFF;
     border-radius: 10px;
@@ -180,3 +181,28 @@ button.primary {
         display: block;
         margin-left: auto;
       }
+
+      .tag-filters {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+    
+    .tag {
+        display: inline-block;
+        margin-right: 10px;
+        padding: 5px 10px;
+        background-color: var(--primary-color);
+        color: #FFF;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .tag:hover {
+        background-color: darkviolet;
+    }
+    
+    .tag.selected {
+        background-color: darkviolet;
+    }    
