@@ -13,6 +13,44 @@ const $editingModeBtn = document.getElementById('editingModeBtn');
 
 var taskList = [];
 
+//usuários
+class App {
+  constructor() {
+
+    this.$users = document.querySelector('#users');
+
+    this.users = [
+      {
+        id: 1,
+        name: 'Carol',
+      },
+      {
+        id: 2,
+        name: 'Isa',
+      },
+      {
+        id: 3,
+        name: 'Juliana',
+      },
+    ];
+
+    this.renderUsers();
+  }
+
+  renderUsers() {
+    const html = this.users
+    .map((user) => {
+      return `
+      <li>${user.name}</li>
+      `;
+    }).join('');
+
+    this.$users.innerHTML = html;
+}
+}
+
+new App();
+
 // Função para abrir o modal no modo de criação de tarefa
 function openModal() {
   $modal.style.display = 'flex';
