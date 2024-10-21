@@ -286,18 +286,63 @@ function updateTaskCount() {
   });
 }
 
+// Variável para armazenar a tag selecionada
 let selectedTag = 'all';
 
+// Função para filtrar tarefas com base na tag selecionada
 function filterTasks(tag) {
-  selectedTag = tag;
-  document.querySelectorAll('.tag').forEach((element) => {
-    element.classList.remove('selected');
-    if (element.textContent.toLowerCase() === tag) {
-      element.classList.add('selected');
-    }
-  });
+  // Se a tag já estiver selecionada, desmarque-a e mostre todas as tarefas
+  if (selectedTag === tag) {
+    selectedTag = 'all';
+  } else {
+    selectedTag = tag;
+  }
+  renderFilteredTasks();
+}
 
-  app.renderTasks();
+// Função para renderizar as tarefas filtradas
+function renderFilteredTasks() {
+  const user = app.users.find(user => user.id === app.selectedUserId);
+  const taskListContainer = document.querySelectorAll('.cards_list');
+
+  if (user) {
+    taskListContainer.forEach(container => container.innerHTML = ''); // Limpar todas as colunas
+    user.tasks.forEach(task => {
+      // Verifica se a tarefa deve ser exibida com base na tag selecionada
+      if (selectedTag === 'all' || task.tags === selectedTag) {
+        const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
+        const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
+
+        if (!columnBody) return;
+
+        const card = `
+          <div
+            id="${task.id}"
+            class="card"
+            ondblclick="openModalToEdit(${task.id})"
+            draggable="true"
+            ondragstart="dragstart_handler(event)"
+          >
+            <div class="info">
+              <b>Descrição:</b>
+              <span>${task.description}</span>
+            </div>
+            <div class="info">
+              <b>Assunto:</b>
+              <span>${task.tags}</span>
+            </div>
+            <div class="info">
+              <b>Prazo:</b>
+              <span>${formattedDate}</span>
+            </div>
+            <button class="material-symbols-outlined" onclick="deleteTask(${task.id})">delete</button>
+          </div>
+        `;
+        columnBody.innerHTML += card;
+      }
+    });
+    updateTaskCount(); // Atualiza a contagem após renderizar as tarefas
+  }
 }
 
 const app = new App();
