@@ -11,10 +11,7 @@ const $editingModeTitle = document.getElementById('editingModeTitle');
 const $creationModeBtn = document.getElementById('creationModeBtn');
 const $editingModeBtn = document.getElementById('editingModeBtn');
 
-// Corrigido: Variável removida pois não é usada
-// var taskList = [];
-
-//usuários
+// Usuários
 class App {
   constructor() {
     this.$users = document.querySelector('#users');
@@ -25,96 +22,100 @@ class App {
 
   async fetchUsers() {
     try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/users'); // API de exemplo para usuários
-        
-        if (!response.ok) {
-            throw new Error(`Erro na resposta da API: ${response.status} ${response.statusText}`);
-        }
+      const response = await fetch('https://jsonplaceholder.typicode.com/users'); // API de exemplo para usuários
+      if (!response.ok) {
+        throw new Error(`Erro na resposta da API: ${response.status} ${response.statusText}`);
+      }
 
-        const users = await response.json();
-        
-        if (users.length === 0) {
-            throw new Error('Nenhum usuário encontrado.');
-        }
+      const users = await response.json();
+      if (users.length === 0) {
+        throw new Error('Nenhum usuário encontrado.');
+      }
 
-        // Limitar a 4 usuários e adicionar uma URL de foto fictícia e tarefas fictícias
-        this.users = users.slice(0, 4).map(user => ({
-            ...user,
-            photoUrl: `https://i.pravatar.cc/150?img=${user.id}`, // API de exemplo para fotos
-            tasks: []
-        }));
+      // Limitar a 4 usuários e adicionar uma URL de foto fictícia e tarefas fictícias
+      this.users = users.slice(0, 4).map(user => ({
+        ...user,
+        photoUrl: `https://i.pravatar.cc/150?img=${user.id}`, // API de exemplo para fotos
+        tasks: []
+      }));
 
-        // Define um usuário padrão como selecionado
-        this.selectedUserId = this.users[0].id; 
-        this.renderUsers();
-        this.renderTasks();
+      // Define um usuário padrão como selecionado
+      this.selectedUserId = this.users[0].id;
+      this.renderUsers();
+      this.renderTasks();
+      updateTaskCount();
     } catch (error) {
-        console.error('Erro ao buscar usuários:', error);
+      console.error('Erro ao buscar usuários:', error);
     }
   }
 
   renderUsers() {
-    const userListContainer = document.getElementById('user-list'); // Certifique-se de ter um elemento com este ID no seu HTML
+    const userListContainer = document.getElementById('user-list');
 
     const html = this.users
-        .map((user) => {
-            const selectedClass = user.id === this.selectedUserId ? 'selected' : '';
-            return `
-                <div class="user-card ${selectedClass}" data-user-id="${user.id}">
-                    <img src="${user.photoUrl}" alt="Foto de ${user.name}" />
-                </div>
-            `;
-        })
-        .join('');
+      .map((user) => {
+        const selectedClass = user.id === this.selectedUserId ? 'selected' : '';
+        return `
+          <div class="user-card ${selectedClass}" data-user-id="${user.id}">
+            <img src="${user.photoUrl}" alt="Foto de ${user.name}" />
+          </div>
+        `;
+      })
+      .join('');
 
     userListContainer.innerHTML = html;
 
     // Adicionar evento de clique a cada cartão de usuário
     document.querySelectorAll('.user-card').forEach(card => {
-        card.addEventListener('click', (event) => {
-            const userId = event.currentTarget.getAttribute('data-user-id');
-            this.selectedUserId = parseInt(userId, 10);
-            this.renderUsers();
-            this.renderTasks();
-        });
+      card.addEventListener('click', (event) => {
+        const userId = event.currentTarget.getAttribute('data-user-id');
+        this.selectedUserId = parseInt(userId, 10);
+        this.renderUsers();
+        this.renderTasks();
+        updateTaskCount();
+      });
     });
   }
 
   renderTasks() {
     const user = this.users.find(user => user.id === this.selectedUserId);
-    const taskListContainer = document.querySelector('.cards_list'); // Certifique-se de ter um elemento com esta classe no seu HTML
+    const taskListContainer = document.querySelectorAll('.cards_list');
 
     if (user) {
-      const tasksHtml = user.tasks
-        .filter(task => selectedTag === 'all' || task.tags === selectedTag)
-        .map(task => {
-          const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
-          return `
-            <div
-              id="${task.id}"
-              class="card"
-              ondblclick="openModalToEdit(${task.id})"
-              draggable="true"
-              ondragstart="dragstart_handler(event)"
-            >
-              <div class="info">
-                <b>Descrição:</b>
-                <span>${task.description}</span>
-              </div>
-              <div class="info">
-                <b>Assunto:</b>
-                <span>${task.tags}</span>
-              </div>
-              <div class="info">
-                <b>Prazo:</b>
-                <span>${formattedDate}</span>
-              </div>
-              <button class="material-symbols-outlined" onclick="deleteTask(${task.id})">delete</button>
+      taskListContainer.forEach(container => container.innerHTML = ''); // Limpar todas as colunas
+      user.tasks.forEach(task => {
+        const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
+        const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
+        
+        if (!columnBody) return;
+        
+        const card = `
+          <div
+            id="${task.id}"
+            class="card"
+            ondblclick="openModalToEdit(${task.id})"
+            draggable="true"
+            ondragstart="dragstart_handler(event)"
+          >
+            <div class="info">
+              <b>Descrição:</b>
+              <span>${task.description}</span>
             </div>
-          `;
-        })
-        .join('');
-      taskListContainer.innerHTML = tasksHtml; // Removido a tag ul desnecessária
+            <div class="info">
+              <b>Assunto:</b>
+              <span>${task.tags}</span>
+            </div>
+            <div class="info">
+              <b>Prazo:</b>
+              <span>${formattedDate}</span>
+            </div>
+            <button class="material-symbols-outlined" onclick="deleteTask(${task.id})">delete</button>
+          </div>
+        `;
+        columnBody.innerHTML += card;
+      });
+
+      updateTaskCount(); // Atualiza a contagem após renderizar as tarefas
     }
   }
 
@@ -130,6 +131,7 @@ class App {
       };
       user.tasks.push(newTask);
       this.renderTasks();
+      updateTaskCount(); // Atualiza a contagem após adicionar
     }
   }
 
@@ -153,18 +155,18 @@ class App {
 
       user.tasks[index] = updatedTask;
       this.renderTasks();
+      updateTaskCount(); // Atualiza a contagem após edição
     }
   }
 }
 
+// Funções de Manipulação de Modal
 function openModal() {
   $modal.style.display = 'flex';
 
-  // Mostra os elementos do modo de criação
   $creationModeTitle.style.display = 'block';
   $creationModeBtn.style.display = 'block';
 
-  // Oculta os elementos do modo de edição
   $editingModeTitle.style.display = 'none';
   $editingModeBtn.style.display = 'none';
 }
@@ -172,7 +174,6 @@ function openModal() {
 function closeModal() {
   $modal.style.display = 'none';
 
-  // Limpa todos os campos do modal
   $idInput.value = '';
   $descriptionInput.value = '';
   $tagsInput.value = '';
@@ -206,7 +207,7 @@ function createTask() {
   const taskDeadline = $deadlineInput.value;
 
   app.addTask(taskTitle, taskTags, taskDeadline);
-
+  updateTaskCount(); // Atualiza a contagem após adicionar
   closeModal(); // Fecha o modal
 }
 
@@ -215,6 +216,7 @@ function deleteTask(taskId) {
   if (user) {
     user.tasks = user.tasks.filter(task => task.id !== taskId);
     app.renderTasks();
+    updateTaskCount(); // Atualiza a contagem após deletar
   }
 }
 
@@ -225,7 +227,7 @@ function updateTask() {
   const taskDeadline = $deadlineInput.value;
 
   app.updateTask(taskId, taskTitle, taskTags, taskDeadline);
-
+  updateTaskCount(); // Atualiza a contagem após edição
   closeModal(); // Fecha o modal
 }
 
@@ -233,25 +235,29 @@ function changeColumn(task_id, column_id) {
   const user = app.users.find(user => user.id === app.selectedUserId);
   if (user) {
     user.tasks = user.tasks.map((task) => {
-      if (task_id != task.id) return task;
-  
+      if (task.id != task_id) return task;
+      
       return {
         ...task,
-        column: column_id,
+        column: parseInt(column_id),
       };
     });
-    app.renderTasks();
+    app.renderTasks(); // Re-renderiza as tarefas para atualizar a interface
+    updateTaskCount(); // Atualiza a contagem após mudança de coluna
   }
 }
 
+// Funções de Drag and Drop
 function dragstart_handler(ev) {
   ev.dataTransfer.setData("task_id", ev.target.id); // Armazena o ID da tarefa que está sendo arrastada
   ev.dataTransfer.effectAllowed = "move";
 }
+
 function dragover_handler(ev) {
   ev.preventDefault(); // Necessário para permitir o drop
   ev.dataTransfer.dropEffect = "move"; // Visualização do efeito de "movimento"
 }
+
 function drop_handler(ev) {
   ev.preventDefault();
   const task_id = ev.dataTransfer.getData("task_id"); // Recupera o ID da tarefa arrastada
@@ -263,30 +269,15 @@ function drop_handler(ev) {
   }
 }
 
-function changeColumn(task_id, column_id) {
-  const user = app.users.find(user => user.id === app.selectedUserId);
-  if (user) {
-    user.tasks = user.tasks.map((task) => {
-      if (task.id != task_id) return task;
-      
-      // Muda a coluna da tarefa
-      return {
-        ...task,
-        column: column_id,
-      };
-    });
-    app.renderTasks(); // Re-renderiza as tarefas para atualizar a interface
-  }
-}
-
-
+// Atualização de Contagem de Tarefas
 function updateTaskCount() {
   const columns = [1, 2, 3]; // IDs das colunas "To Do", "In Progress", e "Completed"
 
   columns.forEach(columnId => {
-    const count = app.users
-      .find(user => user.id === app.selectedUserId)
-      .tasks.filter(task => task.column == columnId).length;
+    const user = app.users.find(user => user.id === app.selectedUserId);
+    if (!user) return;
+    
+    const count = user.tasks.filter(task => parseInt(task.column) === columnId).length;
     const columnHeader = document.querySelector(`[data-column="${columnId}"] .head span`);
     
     if (columnHeader) {
@@ -299,8 +290,6 @@ let selectedTag = 'all';
 
 function filterTasks(tag) {
   selectedTag = tag;
-
-  // Adiciona/remove a classe 'selected' para as tags
   document.querySelectorAll('.tag').forEach((element) => {
     element.classList.remove('selected');
     if (element.textContent.toLowerCase() === tag) {
@@ -311,5 +300,4 @@ function filterTasks(tag) {
   app.renderTasks();
 }
 
-// Certifique-se de que a variável `app` seja global
 const app = new App();
