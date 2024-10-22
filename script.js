@@ -80,29 +80,45 @@ class App {
   renderTasks() {
     const user = this.users.find(user => user.id === this.selectedUserId);
     const taskListContainer = document.querySelectorAll('.cards_list');
-
+  
     if (user) {
       taskListContainer.forEach(container => container.innerHTML = ''); // Limpar todas as colunas
+  
       user.tasks.forEach(task => {
         const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
         const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
         
         if (!columnBody) return;
-        
+  
+        // Define a classe de cor com base na coluna da tarefa
+        let cardClass = '';
+        switch (task.column) {
+          case 1:
+            cardClass = 'todo';
+            break;
+          case 2:
+            cardClass = 'in-progress';
+            break;
+          case 3:
+            cardClass = 'completed';
+            break;
+        }
+  
+        // Criação do HTML do card
         const card = `
           <div
             id="${task.id}"
-            class="card"
+            class="card ${cardClass}"
             ondblclick="openModalToEdit(${task.id})"
             draggable="true"
             ondragstart="dragstart_handler(event)"
           >
             <div class="info">
-              <b>Descrição:</b>
+              <b>Atividade:</b>
               <span>${task.description}</span>
             </div>
             <div class="info">
-              <b>Assunto:</b>
+              <b>Setor:</b>
               <span>${task.tags}</span>
             </div>
             <div class="info">
@@ -114,7 +130,7 @@ class App {
         `;
         columnBody.innerHTML += card;
       });
-
+  
       updateTaskCount(); // Atualiza a contagem após renderizar as tarefas
     }
   }
@@ -236,16 +252,41 @@ function changeColumn(task_id, column_id) {
   if (user) {
     user.tasks = user.tasks.map((task) => {
       if (task.id != task_id) return task;
-      
-      return {
+
+      // Atualiza a coluna da tarefa no objeto
+      const updatedTask = {
         ...task,
         column: parseInt(column_id),
       };
+
+      // Atualiza a classe do card no DOM para refletir a nova coluna
+      const cardElement = document.getElementById(task.id);
+      if (cardElement) {
+        // Remove as classes antigas de cores
+        cardElement.classList.remove('todo', 'in-progress', 'completed');
+
+        // Adiciona a classe correta com base na nova coluna
+        switch (column_id) {
+          case '1':
+            cardElement.classList.add('todo');
+            break;
+          case '2':
+            cardElement.classList.add('in-progress');
+            break;
+          case '3':
+            cardElement.classList.add('completed');
+            break;
+        }
+      }
+
+      return updatedTask;
     });
+
     app.renderTasks(); // Re-renderiza as tarefas para atualizar a interface
     updateTaskCount(); // Atualiza a contagem após mudança de coluna
   }
 }
+
 
 // Funções de Drag and Drop
 function dragstart_handler(ev) {
@@ -286,18 +327,75 @@ function updateTaskCount() {
   });
 }
 
+// Variável para armazenar a tag selecionada
 let selectedTag = 'all';
 
+// Função para filtrar tarefas com base na tag selecionada
 function filterTasks(tag) {
-  selectedTag = tag;
-  document.querySelectorAll('.tag').forEach((element) => {
-    element.classList.remove('selected');
-    if (element.textContent.toLowerCase() === tag) {
-      element.classList.add('selected');
-    }
-  });
+  if (selectedTag === tag) {
+    selectedTag = 'all';
+  } else {
+    selectedTag = tag;
+  }
+  renderFilteredTasks();
+}
 
-  app.renderTasks();
+// Função para renderizar as tarefas filtradas
+function renderFilteredTasks() {
+  const user = app.users.find(user => user.id === app.selectedUserId);
+  const taskListContainer = document.querySelectorAll('.cards_list');
+
+  if (user) {
+    taskListContainer.forEach(container => container.innerHTML = ''); // Limpar todas as colunas
+    user.tasks.forEach(task => {
+      // Verifica se a tarefa deve ser exibida com base na tag selecionada
+      if (selectedTag === 'all' || task.tags === selectedTag) {
+        const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
+        const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
+
+        if (!columnBody) return;
+
+        const card = `
+          <div
+            id="${task.id}"
+<<<<<<< HEAD
+            class="card ${cardClass}"
+=======
+            class="card"
+>>>>>>> 072a3fc634b58a741538fe1b475788f9cdb1e4ee
+            ondblclick="openModalToEdit(${task.id})"
+            draggable="true"
+            ondragstart="dragstart_handler(event)"
+          >
+            <div class="info">
+<<<<<<< HEAD
+              <b>Atividade:</b>
+              <span>${task.description}</span>
+            </div>
+            <div class="info">
+              <b>Setor:</b>
+=======
+              <b>Descrição:</b>
+              <span>${task.description}</span>
+            </div>
+            <div class="info">
+              <b>Assunto:</b>
+>>>>>>> 072a3fc634b58a741538fe1b475788f9cdb1e4ee
+              <span>${task.tags}</span>
+            </div>
+            <div class="info">
+              <b>Prazo:</b>
+              <span>${formattedDate}</span>
+            </div>
+            <button class="material-symbols-outlined" onclick="deleteTask(${task.id})">delete</button>
+          </div>
+        `;
+        columnBody.innerHTML += card;
+      }
+    });
+    updateTaskCount(); // Atualiza a contagem após renderizar as tarefas
+  }
 }
 
 const app = new App();
+
