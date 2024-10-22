@@ -15,8 +15,8 @@ const $editingModeBtn = document.getElementById('editingModeBtn');
 class App {
   constructor() {
     this.$users = document.querySelector('#users');
-    this.selectedUserId = null; // Armazena o ID do usuário selecionado
-    this.users = []; // Inicializa a lista de usuários
+    this.selectedUserId = this.loadSelectedUserId(); // Carrega o ID do usuário selecionado do localStorage
+    this.users = this.loadUsers() || []; // Carrega a lista de usuários do localStorage ou inicializa uma vazia
     this.fetchUsers();
   }
 
@@ -36,17 +36,47 @@ class App {
       this.users = users.slice(0, 4).map(user => ({
         ...user,
         photoUrl: `https://i.pravatar.cc/150?img=${user.id}`, // API de exemplo para fotos
-        tasks: []
+        tasks: this.loadTasksForUser(user.id) || [] // Carrega tarefas do localStorage
       }));
 
-      // Define um usuário padrão como selecionado
-      this.selectedUserId = this.users[0].id;
+      // Define um usuário padrão como selecionado se não houver no localStorage
+      if (!this.selectedUserId) {
+        this.selectedUserId = this.users[0].id;
+      }
+
       this.renderUsers();
       this.renderTasks();
       updateTaskCount();
     } catch (error) {
       console.error('Erro ao buscar usuários:', error);
     }
+  }
+
+  saveUsers() {
+    localStorage.setItem('kanbanUsers', JSON.stringify(this.users));
+  }
+
+  loadUsers() {
+    return JSON.parse(localStorage.getItem('kanbanUsers'));
+  }
+
+  saveSelectedUserId() {
+    localStorage.setItem('selectedUserId', this.selectedUserId);
+  }
+
+  loadSelectedUserId() {
+    return parseInt(localStorage.getItem('selectedUserId'));
+  }
+
+  saveTasksForUser(userId) {
+    const user = this.users.find(user => user.id === userId);
+    if (user) {
+      localStorage.setItem(`tasks_${userId}`, JSON.stringify(user.tasks));
+    }
+  }
+
+  loadTasksForUser(userId) {
+    return JSON.parse(localStorage.getItem(`tasks_${userId}`));
   }
 
   renderUsers() {
@@ -70,6 +100,7 @@ class App {
       card.addEventListener('click', (event) => {
         const userId = event.currentTarget.getAttribute('data-user-id');
         this.selectedUserId = parseInt(userId, 10);
+        this.saveSelectedUserId(); // Salva o usuário selecionado no localStorage
         this.renderUsers();
         this.renderTasks();
         updateTaskCount();
@@ -90,7 +121,6 @@ class App {
         
         if (!columnBody) return;
   
-        // Define a classe de cor com base na coluna da tarefa
         let cardClass = '';
         switch (task.column) {
           case 1:
@@ -104,7 +134,6 @@ class App {
             break;
         }
   
-        // Criação do HTML do card
         const card = `
           <div
             id="${task.id}"
@@ -130,8 +159,9 @@ class App {
         `;
         columnBody.innerHTML += card;
       });
-  
-      updateTaskCount(); // Atualiza a contagem após renderizar as tarefas
+
+      this.saveTasksForUser(this.selectedUserId); // Salva as tarefas do usuário no localStorage
+      updateTaskCount();
     }
   }
 
@@ -139,15 +169,16 @@ class App {
     const user = this.users.find(user => user.id === this.selectedUserId);
     if (user) {
       const newTask = {
-        id: Math.floor(Math.random() * 9999999), // Gera um ID único aleatório para a tarefa
+        id: Math.floor(Math.random() * 9999999),
         description: taskTitle,
         tags: taskTags,
         deadline: taskDeadline,
-        column: 1 // Define sempre a coluna como "To Do" (coluna 1)
+        column: 1
       };
       user.tasks.push(newTask);
       this.renderTasks();
-      updateTaskCount(); // Atualiza a contagem após adicionar
+      this.saveTasksForUser(this.selectedUserId); // Salva após adicionar a tarefa
+      updateTaskCount();
     }
   }
 
@@ -166,12 +197,13 @@ class App {
         description: taskTitle,
         tags: taskTags,
         deadline: taskDeadline,
-        column: existingTask.column // Mantém a coluna atual da tarefa
+        column: existingTask.column
       };
 
       user.tasks[index] = updatedTask;
       this.renderTasks();
-      updateTaskCount(); // Atualiza a contagem após edição
+      this.saveTasksForUser(this.selectedUserId); // Salva após atualização
+      updateTaskCount();
     }
   }
 }
@@ -232,7 +264,8 @@ function deleteTask(taskId) {
   if (user) {
     user.tasks = user.tasks.filter(task => task.id !== taskId);
     app.renderTasks();
-    updateTaskCount(); // Atualiza a contagem após deletar
+    app.saveUsers(); // Salva após deletar
+    updateTaskCount();
   }
 }
 
@@ -246,47 +279,6 @@ function updateTask() {
   updateTaskCount(); // Atualiza a contagem após edição
   closeModal(); // Fecha o modal
 }
-
-function changeColumn(task_id, column_id) {
-  const user = app.users.find(user => user.id === app.selectedUserId);
-  if (user) {
-    user.tasks = user.tasks.map((task) => {
-      if (task.id != task_id) return task;
-
-      // Atualiza a coluna da tarefa no objeto
-      const updatedTask = {
-        ...task,
-        column: parseInt(column_id),
-      };
-
-      // Atualiza a classe do card no DOM para refletir a nova coluna
-      const cardElement = document.getElementById(task.id);
-      if (cardElement) {
-        // Remove as classes antigas de cores
-        cardElement.classList.remove('todo', 'in-progress', 'completed');
-
-        // Adiciona a classe correta com base na nova coluna
-        switch (column_id) {
-          case '1':
-            cardElement.classList.add('todo');
-            break;
-          case '2':
-            cardElement.classList.add('in-progress');
-            break;
-          case '3':
-            cardElement.classList.add('completed');
-            break;
-        }
-      }
-
-      return updatedTask;
-    });
-
-    app.renderTasks(); // Re-renderiza as tarefas para atualizar a interface
-    updateTaskCount(); // Atualiza a contagem após mudança de coluna
-  }
-}
-
 
 // Funções de Drag and Drop
 function dragstart_handler(ev) {
@@ -310,6 +302,43 @@ function drop_handler(ev) {
   }
 }
 
+function changeColumn(task_id, column_id) {
+  const user = app.users.find(user => user.id === app.selectedUserId);
+  if (user) {
+    user.tasks = user.tasks.map((task) => {
+      if (task.id != task_id) return task;
+      
+      const updatedTask = {
+        ...task,
+        column: parseInt(column_id),
+      };
+
+      const cardElement = document.getElementById(task.id);
+      if (cardElement) {
+        cardElement.classList.remove('todo', 'in-progress', 'completed');
+
+        switch (column_id) {
+          case '1':
+            cardElement.classList.add('todo');
+            break;
+          case '2':
+            cardElement.classList.add('in-progress');
+            break;
+          case '3':
+            cardElement.classList.add('completed');
+            break;
+        }
+      }
+
+      return updatedTask;
+    });
+
+    app.renderTasks();
+    app.saveUsers(); // Salva após mudança de coluna
+    updateTaskCount();
+  }
+}
+
 // Atualização de Contagem de Tarefas
 function updateTaskCount() {
   const columns = [1, 2, 3]; // IDs das colunas "To Do", "In Progress", e "Completed"
@@ -328,7 +357,7 @@ function updateTaskCount() {
 }
 
 // Variável para armazenar a tag selecionada
-let selectedTag = 'all';
+let selectedTag = localStorage.getItem('selectedTag') || 'all';
 
 // Função para filtrar tarefas com base na tag selecionada
 function filterTasks(tag) {
@@ -337,10 +366,10 @@ function filterTasks(tag) {
   } else {
     selectedTag = tag;
   }
+  localStorage.setItem('selectedTag', selectedTag); // Salva o filtro selecionado
   renderFilteredTasks();
 }
 
-// Função para renderizar as tarefas filtradas
 function renderFilteredTasks() {
   const user = app.users.find(user => user.id === app.selectedUserId);
   const taskListContainer = document.querySelectorAll('.cards_list');
@@ -348,12 +377,24 @@ function renderFilteredTasks() {
   if (user) {
     taskListContainer.forEach(container => container.innerHTML = ''); // Limpar todas as colunas
     user.tasks.forEach(task => {
-      // Verifica se a tarefa deve ser exibida com base na tag selecionada
       if (selectedTag === 'all' || task.tags === selectedTag) {
         const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
         const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
 
         if (!columnBody) return;
+
+        let cardClass = '';
+        switch (task.column) {
+          case 1:
+            cardClass = 'todo';
+            break;
+          case 2:
+            cardClass = 'in-progress';
+            break;
+          case 3:
+            cardClass = 'completed';
+            break;
+        }
 
         const card = `
           <div
@@ -381,9 +422,9 @@ function renderFilteredTasks() {
         columnBody.innerHTML += card;
       }
     });
-    updateTaskCount(); // Atualiza a contagem após renderizar as tarefas
+    updateTaskCount();
   }
 }
 
+// Certifique-se de que a variável `app` seja global
 const app = new App();
-
