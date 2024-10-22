@@ -7,7 +7,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
   <link rel="stylesheet" href="./style.css">
@@ -26,11 +26,11 @@
   </div>
 
   <div class="tag-filters">
-    <span class="tag" onclick="filterTasks('all')">Todos</span>
-    <span class="tag" onclick="filterTasks('frontend')">FrontEnd</span>
-    <span class="tag" onclick="filterTasks('backend')">BackEnd</span>
-    <span class="tag" onclick="filterTasks('ux design')">UX Design</span>
-  </div>
+    <span class="tag" data-tag="all" onclick="filterTasks('all')">Todos</span>
+    <span class="tag" data-tag="frontend" onclick="filterTasks('frontend')">FrontEnd</span>
+    <span class="tag" data-tag="backend" onclick="filterTasks('backend')">BackEnd</span>
+    <span class="tag" data-tag="ux design" onclick="filterTasks('ux design')">UX Design</span>
+</div>
 
   <div class="container">
     <div class="column" id="a-fazer" data-column="1" ondrop="drop_handler(event)" ondragover="dragover_handler(event)">

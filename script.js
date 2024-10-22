@@ -280,6 +280,90 @@ function updateTask() {
   closeModal(); // Fecha o modal
 }
 
+let selectedTag = 'all';
+
+function filterTasks(tag) {
+  // Alterna a tag selecionada entre 'all' e a tag clicada
+  if (selectedTag === tag) {
+    selectedTag = 'all'; // Se clicar na mesma tag novamente, volta para 'Todos'
+  } else {
+    selectedTag = tag;
+  }
+
+  renderFilteredTasks();
+
+  updateTagStyles();
+}
+
+function updateTagStyles() {
+  const tags = document.querySelectorAll('.tag');
+  tags.forEach(tag => {
+    tag.classList.remove('selected');
+
+    // Verifica a tag atual e aplica a cor correta
+    if (tag.textContent.trim() === 'Todos' && selectedTag === 'all') {
+      tag.classList.add('selected');
+      tag.style.backgroundColor = '#DE8200';
+      tag.style.color = '#FFF';
+    } else if (tag.textContent.trim().toLowerCase() === selectedTag) {
+      tag.classList.add('selected');
+      tag.style.backgroundColor = '#de9f47';
+      tag.style.color = '#FFF';
+    } else {
+      // Reseta o estilo para as tags não selecionadas
+      tag.style.backgroundColor = '#F5F5F5';
+      tag.style.color = '#757575';
+    }
+  });
+}
+
+function renderFilteredTasks() {
+  const user = app.users.find(user => user.id === app.selectedUserId);
+  const taskListContainers = document.querySelectorAll('.cards_list');
+
+  if (user) {
+    taskListContainers.forEach(container => container.innerHTML = '');
+
+    // Percorre as tarefas do usuário
+    user.tasks.forEach(task => {
+      if (selectedTag === 'all' || task.tags.includes(selectedTag)) {
+        const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
+        const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
+
+        if (!columnBody) return;
+
+        const card = `
+          <div
+            id="${task.id}"
+            class="card"
+            ondblclick="openModalToEdit(${task.id})"
+            draggable="true"
+            ondragstart="dragstart_handler(event)"
+          >
+            <div class="info">
+              <b>Descrição:</b>
+              <span>${task.description}</span>
+            </div>
+            <div class="info">
+              <b>Assunto:</b>
+              <span>${task.tags}</span>
+            </div>
+            <div class="info">
+              <b>Prazo:</b>
+              <span>${formattedDate}</span>
+            </div>
+            <button class="material-symbols-outlined" onclick="deleteTask(${task.id})">delete</button>
+          </div>
+        `;
+
+        columnBody.insertAdjacentHTML('beforeend', card);
+      }
+    });
+
+    updateTaskCount();
+  }
+}
+
 // Funções de Drag and Drop
 function dragstart_handler(ev) {
   ev.dataTransfer.setData("task_id", ev.target.id); // Armazena o ID da tarefa que está sendo arrastada
@@ -354,76 +438,6 @@ function updateTaskCount() {
       columnHeader.innerText = `${columnHeader.innerText.split('(')[0].trim()} (${count})`;
     }
   });
-}
-
-// Variável para armazenar a tag selecionada
-let selectedTag = localStorage.getItem('selectedTag') || 'all';
-
-// Função para filtrar tarefas com base na tag selecionada
-function filterTasks(tag) {
-  if (selectedTag === tag) {
-    selectedTag = 'all';
-  } else {
-    selectedTag = tag;
-  }
-  localStorage.setItem('selectedTag', selectedTag); // Salva o filtro selecionado
-  renderFilteredTasks();
-}
-
-function renderFilteredTasks() {
-  const user = app.users.find(user => user.id === app.selectedUserId);
-  const taskListContainer = document.querySelectorAll('.cards_list');
-
-  if (user) {
-    taskListContainer.forEach(container => container.innerHTML = ''); // Limpar todas as colunas
-    user.tasks.forEach(task => {
-      if (selectedTag === 'all' || task.tags === selectedTag) {
-        const formattedDate = moment(task.deadline).format('DD/MM/YYYY');
-        const columnBody = document.querySelector(`[data-column="${task.column}"] .body .cards_list`);
-
-        if (!columnBody) return;
-
-        let cardClass = '';
-        switch (task.column) {
-          case 1:
-            cardClass = 'todo';
-            break;
-          case 2:
-            cardClass = 'in-progress';
-            break;
-          case 3:
-            cardClass = 'completed';
-            break;
-        }
-
-        const card = `
-          <div
-            id="${task.id}"
-            class="card ${cardClass}"
-            ondblclick="openModalToEdit(${task.id})"
-            draggable="true"
-            ondragstart="dragstart_handler(event)"
-          >
-            <div class="info">
-              <b>Atividade:</b>
-              <span>${task.description}</span>
-            </div>
-            <div class="info">
-              <b>Setor:</b>
-              <span>${task.tags}</span>
-            </div>
-            <div class="info">
-              <b>Prazo:</b>
-              <span>${formattedDate}</span>
-            </div>
-            <button class="material-symbols-outlined" onclick="deleteTask(${task.id})">delete</button>
-          </div>
-        `;
-        columnBody.innerHTML += card;
-      }
-    });
-    updateTaskCount();
-  }
 }
 
 // Certifique-se de que a variável `app` seja global
