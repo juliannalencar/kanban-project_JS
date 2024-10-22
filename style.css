@@ -15,7 +15,6 @@
   align-items: center;
   background-color: #18134C;
   flex-wrap: wrap; 
-
   color: #FFF;
 }
 
@@ -29,7 +28,7 @@
     }
 
     .header .left-side h1 {
-      margin: 33px auto 33px 88px;
+      margin: 30px auto 30px 88px;
       font-size: 28px;
     }
 
@@ -167,19 +166,6 @@
         flex-direction: column;
       }
 
-      .container .column .body .add_btn {
-        background: none;
-        border: 1px solid;
-        border-radius: 10px;
-        padding: 5px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        cursor: pointer;
-        color: #444;
-      }
-
       /* tarefas*/
       .container .column .body .card {
         position: relative;
@@ -223,7 +209,7 @@
           cursor: pointer;
           margin-right: 24px;
         }
-
+       
 #modal {
   position: fixed;
   top: 0;
@@ -238,7 +224,7 @@
 
   #modal .box {
     background-color: #FFF;
-    width: 724px;
+    width: 640px;
     border-radius: 8px;
     overflow: hidden;
     padding: 40px;
@@ -247,7 +233,7 @@
     #modal .box .head {
       display: flex;
       justify-content: space-between;
-      padding: 0 18px;
+      padding-left: 18px;
     }
 
       #modal .box .head span {
@@ -262,7 +248,16 @@
         font-size: 24px;
         font-weight: 700;
         cursor: pointer;
-        color: #cb1212;
+        color: #333;
+        margin-top: 28px;
+        margin-right: 0;
+      }
+
+      #modal .box .head button#close {
+        position: relative;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
       }
     
     #modal .box .modal-description {
@@ -298,20 +293,18 @@
         border-radius: 8px;
         font-size: 16px;
         border: 1px solid #B3B3B3;
-        color: #B3B3B3;
+        color: #1E1E1E;
       }
 
+      #modal .box .form select,
+      #modal .box .form input {
+        padding: 12px;
+      }
+      
       #modal .box .form textarea {
         padding: 10px 15px;
         resize: none;
-      }
-
-      #modal .box .form select {        
-        padding: 12px;
-      }
-
-      #modal .box .form input {
-        padding: 12px;
+        color: #1E1E1E; 
       }
 
       #modal .box .form button {
@@ -323,6 +316,7 @@
         color: #FFF;
         border-radius: 8px;
         border: none;
+        font-size: 16px;
       }
       
       #user-list {
