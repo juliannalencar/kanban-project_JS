@@ -358,29 +358,17 @@ function renderFilteredTasks() {
         const card = `
           <div
             id="${task.id}"
-<<<<<<< HEAD
             class="card ${cardClass}"
-=======
-            class="card"
->>>>>>> 072a3fc634b58a741538fe1b475788f9cdb1e4ee
             ondblclick="openModalToEdit(${task.id})"
             draggable="true"
             ondragstart="dragstart_handler(event)"
           >
             <div class="info">
-<<<<<<< HEAD
               <b>Atividade:</b>
               <span>${task.description}</span>
             </div>
             <div class="info">
               <b>Setor:</b>
-=======
-              <b>Descrição:</b>
-              <span>${task.description}</span>
-            </div>
-            <div class="info">
-              <b>Assunto:</b>
->>>>>>> 072a3fc634b58a741538fe1b475788f9cdb1e4ee
               <span>${task.tags}</span>
             </div>
             <div class="info">
