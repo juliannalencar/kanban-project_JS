@@ -238,20 +238,20 @@
 
   #modal .box {
     background-color: #FFF;
-    width: 400px;
-    border-radius: 7px;
+    width: 724px;
+    border-radius: 8px;
     overflow: hidden;
+    padding: 40px;
   }
 
     #modal .box .head {
       display: flex;
       justify-content: space-between;
-      padding: 15px 20px;
-      border-bottom: 1px solid #DDD;
+      padding: 0 18px;
     }
 
       #modal .box .head span {
-        font-size: 18px;
+        font-size: 24px;
         font-weight: 700;
         color: #333;
       }
@@ -262,21 +262,32 @@
         font-size: 24px;
         font-weight: 700;
         cursor: pointer;
-        color: #333;
+        color: #cb1212;
       }
-
+    
+    #modal .box .modal-description {
+      font-size: 16px;
+      color: #B3B3B3;
+      margin-top: 12px;
+      padding: 0 18px;
+    }
+      
     #modal .box .form {
-      padding: 20px;
+      padding: 0 18px;
+      margin-top: 36px;
     }
 
       #modal .box .form .form-group {
-        margin-bottom: 15px;
+        margin-bottom: 28px;
+      }
+
+      #modal .box .form .form-group #description::placeholder {
+        color: #B3B3B3;  
       }
 
       #modal .box .form label {
         display: block;
-        font-size: 14px;
-        color: #333;
+        font-size: 16px;
         margin-bottom: 5px;
       }
 
@@ -284,10 +295,10 @@
       #modal .box .form select,
       #modal .box .form input {
         width: 100%;
-        border-radius: 7px;
-        font-size: 14px;
-        border: 1px solid #999;
-        color: #333;
+        border-radius: 8px;
+        font-size: 16px;
+        border: 1px solid #B3B3B3;
+        color: #B3B3B3;
       }
 
       #modal .box .form textarea {
@@ -305,7 +316,7 @@
 
       #modal .box .form button {
         display: block;
-        margin-top: 67px;
+        margin-top: 48px;
         margin-left: auto;
         padding: 20px;
         background-color: #4C12EE;
@@ -314,7 +325,6 @@
         border: none;
       }
       
-
       #user-list {
         display: flex;
         justify-content: center;
