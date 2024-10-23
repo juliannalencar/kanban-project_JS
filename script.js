@@ -1,4 +1,3 @@
-// Seleção de elementos do modal e inputs para manipulação de tarefas
 const $modal = document.getElementById('modal');
 const $descriptionInput = document.getElementById('description');
 const $tagsInput = document.getElementById('tags');
@@ -160,7 +159,7 @@ class App {
         columnBody.innerHTML += card;
       });
 
-      this.saveTasksForUser(this.selectedUserId); // Salva as tarefas do usuário no localStorage
+      this.saveTasksForUser(this.selectedUserId); 
       updateTaskCount();
     }
   }
@@ -177,7 +176,7 @@ class App {
       };
       user.tasks.push(newTask);
       this.renderTasks();
-      this.saveTasksForUser(this.selectedUserId); // Salva após adicionar a tarefa
+      this.saveTasksForUser(this.selectedUserId); 
       updateTaskCount();
     }
   }
@@ -202,7 +201,7 @@ class App {
 
       user.tasks[index] = updatedTask;
       this.renderTasks();
-      this.saveTasksForUser(this.selectedUserId); // Salva após atualização
+      this.saveTasksForUser(this.selectedUserId); 
       updateTaskCount();
     }
   }
@@ -255,8 +254,8 @@ function createTask() {
   const taskDeadline = $deadlineInput.value;
 
   app.addTask(taskTitle, taskTags, taskDeadline);
-  updateTaskCount(); // Atualiza a contagem após adicionar
-  closeModal(); // Fecha o modal
+  updateTaskCount(); 
+  closeModal(); 
 }
 
 function deleteTask(taskId) {
@@ -264,7 +263,7 @@ function deleteTask(taskId) {
   if (user) {
     user.tasks = user.tasks.filter(task => task.id !== taskId);
     app.renderTasks();
-    app.saveUsers(); // Salva após deletar
+    app.saveUsers(); 
     updateTaskCount();
   }
 }
@@ -276,8 +275,8 @@ function updateTask() {
   const taskDeadline = $deadlineInput.value;
 
   app.updateTask(taskId, taskTitle, taskTags, taskDeadline);
-  updateTaskCount(); // Atualiza a contagem após edição
-  closeModal(); // Fecha o modal
+  updateTaskCount(); 
+  closeModal(); 
 }
 
 let selectedTag = 'all';
@@ -332,20 +331,34 @@ function renderFilteredTasks() {
 
         if (!columnBody) return;
 
+        // Define a classe CSS do card com base na coluna
+        let cardClass = '';
+        switch (task.column) {
+          case 1:
+            cardClass = 'todo';
+            break;
+          case 2:
+            cardClass = 'in-progress';
+            break;
+          case 3:
+            cardClass = 'completed';
+            break;
+        }
+
         const card = `
           <div
             id="${task.id}"
-            class="card"
+            class="card ${cardClass}"
             ondblclick="openModalToEdit(${task.id})"
             draggable="true"
             ondragstart="dragstart_handler(event)"
           >
             <div class="info">
-              <b>Descrição:</b>
+              <b>Atividade:</b>
               <span>${task.description}</span>
             </div>
             <div class="info">
-              <b>Assunto:</b>
+              <b>Setor:</b>
               <span>${task.tags}</span>
             </div>
             <div class="info">
@@ -418,7 +431,7 @@ function changeColumn(task_id, column_id) {
     });
 
     app.renderTasks();
-    app.saveUsers(); // Salva após mudança de coluna
+    app.saveUsers(); 
     updateTaskCount();
   }
 }
@@ -440,5 +453,4 @@ function updateTaskCount() {
   });
 }
 
-// Certifique-se de que a variável `app` seja global
 const app = new App();
