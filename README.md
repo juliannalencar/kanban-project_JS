@@ -1,5 +1,9 @@
 # Kanban Board - Trabalho Final
 
+<p align="center">
+  <img alt="Kanban Project" src=".github/preview.gif" width="100%">
+</p>
+
 Este é o trabalho final da disciplina Front-End Dinâmico (JS DOM), ministrada pela **Ada Tech** e orientada pelo professor [Palmer Oliveira](https://github.com/expalmer) como parte do programa **Santander Coders 2024.1**. Desenvolvemos um **Kanban Board** utilizando HTML, CSS e JavaScript. O projeto implementa funcionalidades de organização de tarefas através de um quadro com colunas de "A fazer", "Em progresso" e "Concluído", com suporte a múltiplos usuários, tags para categorização, movimentação de cards e filtros.
 
 ## Funcionalidades
